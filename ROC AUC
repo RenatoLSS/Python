@@ -1,0 +1,54 @@
+# Importando as bibliotecas necessárias
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import roc_curve, roc_auc_score
+
+# 1. Criando um conjunto de dados fictício (simulado) para classificação binária
+# Esse conjunto tem 1000 exemplos, com 20 características (colunas)
+X, y = make_classification(n_samples=1000, n_features=20, n_classes=2,
+                           n_informative=2, n_redundant=10, random_state=42)
+
+# 2. Dividindo os dados em duas partes: treino (70%) e teste (30%)
+X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 3. Criando o modelo de Regressão Logística
+modelo = LogisticRegression()
+
+# 4. Treinando (ajustando) o modelo com os dados de treino
+modelo.fit(X_treino, y_treino)
+
+# 5. Fazendo previsões com os dados de teste
+y_previsto = modelo.predict(X_teste)  # Previsão final (0 ou 1)
+y_probabilidades = modelo.predict_proba(X_teste)[:, 1]  # Probabilidade de ser classe 1 (positivo)
+
+# 6. Gerando a Matriz de Confusão
+# Compara o que o modelo previu com o que era realmente
+matriz = confusion_matrix(y_teste, y_previsto)
+
+# Exibindo a matriz de confusão em formato gráfico
+disp = ConfusionMatrixDisplay(confusion_matrix=matriz)
+disp.plot()
+plt.title("Matriz de Confusão")
+plt.show()
+
+# 7. Criando a Curva ROC
+# Essa curva mostra a performance do modelo em diferentes limiares de decisão
+fpr, tpr, limiares = roc_curve(y_teste, y_probabilidades)  # fpr = taxa de falso positivo, tpr = taxa de verdadeiro positivo
+
+# 8. Calculando a AUC (Área sob a curva ROC)
+auc = roc_auc_score(y_teste, y_probabilidades)
+
+# 9. Exibindo o gráfico da Curva ROC
+plt.figure()
+plt.plot(fpr, tpr, label=f'Curva ROC (AUC = {auc:.2f})')
+plt.plot([0, 1], [0, 1], 'k--')  # Linha tracejada (modelo aleatório)
+plt.xlabel("Taxa de Falsos Positivos")
+plt.ylabel("Taxa de Verdadeiros Positivos")
+plt.title("Curva ROC")
+plt.legend(loc="lower right")
+plt.grid()
+plt.show()
