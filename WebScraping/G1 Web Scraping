@@ -1,0 +1,22 @@
+import requests
+from bs4 import BeautifulSoup
+
+# URL de exemplo
+url = "https://g1.globo.com/"
+
+# Faz a requisição da página
+response = requests.get(url)
+
+# Verifica se deu certo
+if response.status_code == 200:
+    # Analisa o HTML
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Busca os títulos das notícias
+    noticias = soup.find_all("a", class_="feed-post-link")
+
+    print("Títulos das notícias:")
+    for i, noticia in enumerate(noticias[:10], start=1):  # pega só as 10 primeiras
+        print(f"{i}. {noticia.text.strip()}")
+else:
+    print("Erro ao acessar a página:", response.status_code)
